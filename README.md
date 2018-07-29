@@ -1,7 +1,7 @@
 # lapis
 This is a Mirakurun version Golang port of [Antennas](https://github.com/TheJF/antennas) .
 An API bridge server whitch translate Mirakurun API to HDhomerun API.
-This enables to use [PlexDTV feature](https://www.plex.tv/ja/live-tv-dvr/) .
+This enables to use [PlexDVR feature](https://www.plex.tv/ja/live-tv-dvr/) .
 
 ## How to use
 - edit `.env` file and set your configuration.
