@@ -10,6 +10,6 @@ This enables to use [PlexDVR feature](https://www.plex.tv/ja/live-tv-dvr/) .
 - Have fun!!
 
 ## Known issues (?)
-- Live TV : GR only
-- Program guide : provided by Plex (GR only)
-- Recording : It may works but can not watch at web console. It seems that CM removal does not works
+- Live TV : guide from Gracenote : GR only but very convenient. guide from `/epg.xml` : GR/BS/CS available.
+- Program guide : provided by Plex (GR only). `/epg.xml` is not fully functional EPG, but GR/BS/CS available.
+- Recording : It may works. It seems that CM removal does not works??
