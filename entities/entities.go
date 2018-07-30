@@ -65,3 +65,82 @@ type Channel struct {
 
 // Channels : json
 type Channels []Channel
+
+// Guide : xml
+type Guide struct {
+	XMLName           xml.Name         `xml:"tv"`
+	GeneratorInfoName string           `xml:"generator-info-name,attr"`
+	Channel           []ChannelGuide   `xml:"channel"`
+	Programme         []ProgrammeGuide `xml:"programme"`
+}
+
+// ChannelGuide : xml
+type ChannelGuide struct {
+	ID          string           `xml:"id,attr"`
+	DisplayName DisplayNameGuide `xml:"display-name"`
+}
+
+// DisplayNameGuide : xml
+type DisplayNameGuide struct {
+	Lang        string `xml:"lang,attr"`
+	DisplayName string `xml:",chardata"`
+}
+
+// ProgrammeGuide : xml
+type ProgrammeGuide struct {
+	Start    string        `xml:"start,attr"`
+	Stop     string        `xml:"stop,attr"`
+	Channel  string        `xml:"channel,attr"`
+	Title    TitleGuide    `xml:"title"`
+	Desc     DescGuide     `xml:"desc"`
+	Category CategoryGuide `xml:"category"`
+}
+
+// TitleGuide : xml
+type TitleGuide struct {
+	Lang  string `xml:"lang,attr"`
+	Title string `xml:",chardata"`
+}
+
+// DescGuide : xml
+type DescGuide struct {
+	Lang string `xml:"lang,attr"`
+	Desc string `xml:",chardata"`
+}
+
+// CategoryGuide : xml
+type CategoryGuide struct {
+	Lang     string `xml:"lang,attr"`
+	Category string `xml:",chardata"`
+}
+
+// Schedule : json
+type Schedule struct {
+	ID        string          `json:"id"`
+	Category  string          `json:"category"`
+	Title     string          `json:"title"`
+	FullTitle string          `json:"fulltitle"`
+	Detail    string          `json:"detail"`
+	Start     int64           `json:"start"`
+	End       int64           `json:"end"`
+	Seconds   int             `json:"seconds"`
+	Desc      string          `json:"description"`
+	Extra     ExtraSchedule   `json:"extra"`
+	Channel   ChannelSchedule `json:"channel"`
+}
+
+// Schedules : json
+type Schedules []Schedule
+
+// ExtraSchedule : json
+type ExtraSchedule struct {
+	Desc  string `json:"番組内容"`
+	Act   string `json:"出演者"`
+	Music string `json:"原作・脚本"`
+}
+
+// ChannelSchedule : json
+type ChannelSchedule struct {
+	SID  int    `json:"sid"`
+	Name string `json:"name"`
+}

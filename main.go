@@ -27,6 +27,7 @@ func main() {
 	r.GET("/device.xml", router.DeviceInfo)
 	r.GET("/ConnectionManager.xml", router.ConnectionManager)
 	r.GET("/ContentDirectory.xml", router.ContentDirectory)
+	r.GET("/epg.xml", router.EPG)
 	r.POST("/lineup.post", router.PostLineup)
 
 	r.Run(":" + os.Getenv("LAPIS_PORT"))

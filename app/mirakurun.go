@@ -35,7 +35,7 @@ func SetLineup() []entities.Lineup {
 		for _, vv := range v.Services {
 			var items entities.Lineup
 			items.GuideName = vv.Name
-			items.GuideNumber = strconv.Itoa(vv.ID)
+			items.GuideNumber = strconv.Itoa(vv.ServiceID)
 			items.URL = base + v.Type + "/" + v.Channel + "/services/" + strconv.Itoa(vv.ServiceID) + "/stream/"
 			lineups = append(lineups, items)
 		}
