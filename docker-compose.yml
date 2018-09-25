@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  lapis:
+    restart:  always
+    build:  .
+    image:  plainbanana/lapis
+    env_file: .env
+    networks:
+      - external_network
+    ports:
+      - "127.0.0.1:8080:8080"
+
+networks:
+  external_network:

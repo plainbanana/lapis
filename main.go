@@ -17,7 +17,9 @@ func envLoad() {
 }
 
 func main() {
-	envLoad()
+	if os.Getenv("DOTENV") == "true" {
+		envLoad()
+	}
 
 	r := gin.Default()
 
