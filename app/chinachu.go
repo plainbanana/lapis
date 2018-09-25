@@ -22,7 +22,7 @@ func ConvertEpgToXML() *entities.Guide {
 
 	res, err := http.Get(base) // get program guides as json
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	defer res.Body.Close()
 

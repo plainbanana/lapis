@@ -19,7 +19,7 @@ func SetLineup() []entities.Lineup {
 
 	res, err := http.Get(base) // get channel lists as json
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	defer res.Body.Close()
 
@@ -27,7 +27,7 @@ func SetLineup() []entities.Lineup {
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&s)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	var lineups []entities.Lineup
