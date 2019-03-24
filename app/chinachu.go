@@ -14,6 +14,7 @@ import (
 // ConvertEpgToXML : GET /api/schedule/programs.json -> epg.xml
 func ConvertEpgToXML() *entities.Guide {
 	const xmldateformat = "20060102150400 -0700"
+	const originalairdateformat = "2006-01-02 15:04:05"
 
 	base := "http://" + os.Getenv("CHINACHU_IP") + ":" + os.Getenv("CHINACHU_PORT") + "/api/schedule/programs.json"
 	if os.Getenv("MIRAKURUN_HTTPS") == "true" {
@@ -51,6 +52,11 @@ func ConvertEpgToXML() *entities.Guide {
 		p.Desc.Desc = v.Detail
 		p.Title.Title = v.Title
 		p.Category.Lang, p.Desc.Lang, p.Title.Lang = "ja_JP", "ja_JP", "ja_JP"
+		// Plex DVR recognize tvseries from whitch programme has episode-num or not
+		if v.Category != "movie" {
+			p.EpisodeNum.System = "original-air-date"
+			p.EpisodeNum.EpisodeNum = time.Unix(0, v.Start*1000000).Format(originalairdateformat)
+		}
 		xml.Programme = append(xml.Programme, p)
 	}
 

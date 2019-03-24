@@ -88,12 +88,13 @@ type DisplayNameGuide struct {
 
 // ProgrammeGuide : xml
 type ProgrammeGuide struct {
-	Start    string        `xml:"start,attr"`
-	Stop     string        `xml:"stop,attr"`
-	Channel  string        `xml:"channel,attr"`
-	Title    TitleGuide    `xml:"title"`
-	Desc     DescGuide     `xml:"desc"`
-	Category CategoryGuide `xml:"category"`
+	Start      string          `xml:"start,attr"`
+	Stop       string          `xml:"stop,attr"`
+	Channel    string          `xml:"channel,attr"`
+	Title      TitleGuide      `xml:"title"`
+	Desc       DescGuide       `xml:"desc"`
+	Category   CategoryGuide   `xml:"category"`
+	EpisodeNum EpisodeNumGuide `xml:"episode-num"`
 }
 
 // TitleGuide : xml
@@ -112,6 +113,12 @@ type DescGuide struct {
 type CategoryGuide struct {
 	Lang     string `xml:"lang,attr"`
 	Category string `xml:",chardata"`
+}
+
+// EpisodeNumGuide : xml
+type EpisodeNumGuide struct {
+	System     string `xml:"system,attr"`
+	EpisodeNum string `xml:",chardata"`
 }
 
 // Schedule : json
