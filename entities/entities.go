@@ -92,6 +92,7 @@ type ProgrammeGuide struct {
 	Stop       string          `xml:"stop,attr"`
 	Channel    string          `xml:"channel,attr"`
 	Title      TitleGuide      `xml:"title"`
+	SubTitle   TitleGuide      `xml:"sub-title"`
 	Desc       DescGuide       `xml:"desc"`
 	Category   CategoryGuide   `xml:"category"`
 	EpisodeNum EpisodeNumGuide `xml:"episode-num"`
@@ -134,6 +135,8 @@ type Schedule struct {
 	Desc      string          `json:"description"`
 	Extra     ExtraSchedule   `json:"extra"`
 	Channel   ChannelSchedule `json:"channel"`
+	SubTitle  string          `json:"subTitle"`
+	Episode   int             `json:"episode"`
 }
 
 // Schedules : json

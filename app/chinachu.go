@@ -1,8 +1,11 @@
 package app
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,10 +14,26 @@ import (
 	"github.com/plainbanana/lapis/entities"
 )
 
+func hashMod(value string) int {
+	str := fmt.Sprintf("%x", sha256.Sum256([]byte(value)))
+	numHash, err := strconv.ParseInt(str[:10], 16, 64)
+	if err != nil {
+		log.Fatal("Error:", err)
+	}
+	numReduce := 10000000
+	if err != nil {
+		log.Fatal("Error:", err)
+	}
+	fHash := float64(numHash)
+	fReduce := float64(numReduce)
+	return int(math.Mod(fHash, fReduce))
+}
+
 // ConvertEpgToXML : GET /api/schedule/programs.json -> epg.xml
 func ConvertEpgToXML() *entities.Guide {
 	const xmldateformat = "20060102150400 -0700"
 	const originalairdateformat = "2006-01-02 15:04:05"
+	const episodedateformat = "0102"
 
 	base := "http://" + os.Getenv("CHINACHU_IP") + ":" + os.Getenv("CHINACHU_PORT") + "/api/schedule/programs.json"
 	if os.Getenv("MIRAKURUN_HTTPS") == "true" {
@@ -51,11 +70,20 @@ func ConvertEpgToXML() *entities.Guide {
 		p.Category.Category = v.Category
 		p.Desc.Desc = v.Detail
 		p.Title.Title = v.Title
-		p.Category.Lang, p.Desc.Lang, p.Title.Lang = "ja_JP", "ja_JP", "ja_JP"
+		p.SubTitle.Title = v.SubTitle
+		p.Category.Lang, p.Desc.Lang, p.Title.Lang, p.SubTitle.Lang = "ja_JP", "ja_JP", "ja_JP", "ja_JP"
 		// Plex DVR recognize tvseries from whitch programme has episode-num or not
-		if v.Category != "movie" {
-			p.EpisodeNum.System = "original-air-date"
-			p.EpisodeNum.EpisodeNum = time.Unix(0, v.Start*1000000).Format(originalairdateformat)
+		if v.Category != "cinema" {
+			p.EpisodeNum.System = "dd_progid"
+			var tail string
+			if v.Episode == 0 {
+				tail = time.Unix(0, v.Start*1000000).Format(episodedateformat)
+			} else {
+				tail = fmt.Sprintf("%04d", v.Episode)
+			}
+			p.EpisodeNum.EpisodeNum = "EP" + fmt.Sprintf("%08d", hashMod(v.Title)) + "." + tail
+			// p.EpisodeNum.System = "original-air-date"
+			// p.EpisodeNum.EpisodeNum = time.Unix(0, v.Start*1000000).Format(originalairdateformat)
 		}
 		xml.Programme = append(xml.Programme, p)
 	}
