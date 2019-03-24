@@ -70,8 +70,13 @@ func ConvertEpgToXML() *entities.Guide {
 		p.Channel = strconv.Itoa(v.Channel.SID)
 		p.Category.Category = v.Category
 		p.Desc.Desc = v.Detail
-		p.Title.Title = v.Title
-		p.SubTitle.Title = v.SubTitle
+		titleSlice := strings.Split(v.Title, "▽")
+		p.Title.Title = titleSlice[0]
+		if len(titleSlice) >= 2 {
+			p.SubTitle.Title = v.SubTitle + " " + titleSlice[1]
+		} else {
+			p.SubTitle.Title = v.SubTitle
+		}
 		p.Category.Lang, p.Desc.Lang, p.Title.Lang, p.SubTitle.Lang = "ja_JP", "ja_JP", "ja_JP", "ja_JP"
 		// Plex DVR recognize tvseries from whitch programme has episode-num or not
 		if v.Category != "cinema" {
