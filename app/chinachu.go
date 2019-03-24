@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/plainbanana/lapis/entities"
@@ -81,7 +82,7 @@ func ConvertEpgToXML() *entities.Guide {
 			} else {
 				tail = fmt.Sprintf("%04d", v.Episode)
 			}
-			p.EpisodeNum.EpisodeNum = "EP" + fmt.Sprintf("%08d", hashMod(v.Title)) + "." + tail
+			p.EpisodeNum.EpisodeNum = "EP" + fmt.Sprintf("%08d", hashMod(strings.Split(v.Title, "　")[0])) + "." + tail
 			// p.EpisodeNum.System = "original-air-date"
 			// p.EpisodeNum.EpisodeNum = time.Unix(0, v.Start*1000000).Format(originalairdateformat)
 		}
