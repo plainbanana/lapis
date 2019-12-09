@@ -1,10 +1,10 @@
 # lapis builder image
-FROM golang:latest as builder
+FROM golang:1.13.4 as builder
 LABEL maintainer "plainbanana <kazukidegozaimasuruzo@gmail.com>"
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
-WORKDIR /go/src/github.com/plainbanana/lapis
+WORKDIR /plainbanana/lapis
 COPY . .
 RUN make
 
@@ -14,5 +14,5 @@ FROM alpine
 LABEL maintainer "plainbanana <kazukidegozaimasuruzo@gmail.com>"
 ENV DOTENV=false
 RUN apk add --no-cache ca-certificates
-COPY --from=builder /go/src/github.com/plainbanana/lapis/lapis /lapis
+COPY --from=builder /plainbanana/lapis/lapis /lapis
 CMD ["/lapis"]
