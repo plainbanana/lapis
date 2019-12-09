@@ -34,7 +34,7 @@ func Stream(c *gin.Context) {
 		"-probesize", "2MB",
 		"-fix_sub_duration",
 		"-i", input, "-c:v", "copy",
-		"-c:a", "copy",
+		"-acodec", "ac3", "-b:a", "192k",
 		"-c:s", "webvtt",
 		"-f", "matroska", "pipe:1")
 
