@@ -10,6 +10,6 @@ This enables to use [PlexDVR feature](https://www.plex.tv/ja/live-tv-dvr/) .
 - Have fun!!
 
 ## Known issues (?)
-- Live TV : guide from Gracenote : GR only but very convenient. guide from `/epg.xml` : GR/BS/CS available.
-- Program guide : provided by Plex (GR only). `/epg.xml` is not fully functional EPG, but GR/BS/CS available.
+- Live TV : guide from Gracenote : guide from `/epg.xml`. GR/BS/CS available.
+- Program guide : provided by Plex `/epg.xml` is not fully functional EPG. GR/BS/CS available.
 - Recording : It works.
