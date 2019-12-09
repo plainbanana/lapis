@@ -1,10 +1,9 @@
 # version=1.0
 
-all: setup build
+all: build
 
-setup:
-	go get -u github.com/golang/dep/cmd/dep
-	dep ensure
+rundev:
+	DOTENV=true go run main.go
 
 build:
 	go build -o lapis main.go
