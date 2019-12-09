@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -30,13 +31,20 @@ func SetLineup() []entities.Lineup {
 		log.Println(err)
 	}
 
+	lapisuri := os.Getenv("LAPIS_HOSTNAME")
+	if lapisuri == "" {
+		lapisuri = "localhost"
+	}
+
 	var lineups []entities.Lineup
 	for _, v := range s {
 		for _, vv := range v.Services {
 			var items entities.Lineup
 			items.GuideName = vv.Name
 			items.GuideNumber = strconv.Itoa(vv.ServiceID)
-			items.URL = base + v.Type + "/" + v.Channel + "/services/" + strconv.Itoa(vv.ServiceID) + "/stream/"
+			origURL := base + v.Type + "/" + v.Channel + "/services/" + strconv.Itoa(vv.ServiceID) + "/stream/"
+			b64url := base64.StdEncoding.EncodeToString([]byte(origURL))
+			items.URL = "http://" + lapisuri + ":" + entities.LapisPort + "/stream/" + b64url
 			lineups = append(lineups, items)
 		}
 	}

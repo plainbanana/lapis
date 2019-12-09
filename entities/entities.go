@@ -2,6 +2,12 @@ package entities
 
 import "encoding/xml"
 
+// LapisVersion is version
+var LapisVersion = "1.1.0"
+
+// LapisPort is port of lapis
+var LapisPort string
+
 // Device : device info
 type Device struct {
 	FriendlyName string `json:"FriendlyName"`

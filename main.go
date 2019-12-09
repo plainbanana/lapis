@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/plainbanana/lapis/entities"
 	"github.com/plainbanana/lapis/router"
 )
 
@@ -31,6 +32,12 @@ func main() {
 	r.GET("/ContentDirectory.xml", router.ContentDirectory)
 	r.GET("/epg.xml", router.EPG)
 	r.POST("/lineup.post", router.PostLineup)
+	r.GET("/stream/:OriginURL", router.Stream)
 
-	r.Run(":" + os.Getenv("LAPIS_PORT"))
+	entities.LapisPort = os.Getenv("LAPIS_PORT")
+	if entities.LapisPort == "" {
+		entities.LapisPort = "8080"
+	}
+
+	r.Run(":" + entities.LapisPort)
 }
