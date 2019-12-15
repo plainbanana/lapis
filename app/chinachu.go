@@ -15,6 +15,15 @@ import (
 	"github.com/plainbanana/lapis/entities"
 )
 
+// Xmldateformat is xmltv
+const Xmldateformat = "20060102150400 -0700"
+
+// Originalairdateformat chinachu format
+const Originalairdateformat = "2006-01-02 15:04:05"
+
+// Episodedateformat episodedate
+const Episodedateformat = "0102"
+
 func hashMod(value string) int {
 	str := fmt.Sprintf("%x", sha256.Sum256([]byte(value)))
 	numHash, err := strconv.ParseInt(str[:10], 16, 64)
@@ -32,9 +41,6 @@ func hashMod(value string) int {
 
 // ConvertEpgToXML : GET /api/schedule/programs.json -> epg.xml
 func ConvertEpgToXML() *entities.Guide {
-	const xmldateformat = "20060102150400 -0700"
-	const originalairdateformat = "2006-01-02 15:04:05"
-	const episodedateformat = "0102"
 
 	base := "http://" + os.Getenv("CHINACHU_IP") + ":" + os.Getenv("CHINACHU_PORT") + "/api/schedule/programs.json"
 	if os.Getenv("MIRAKURUN_HTTPS") == "true" {
@@ -61,12 +67,13 @@ func ConvertEpgToXML() *entities.Guide {
 		c.ID = v.GuideNumber
 		c.DisplayName.DisplayName = v.GuideName
 		c.DisplayName.Lang = "ja_JP"
+		c.Icon.Src = setChannelIconURL(c.ID)
 		xml.Channel = append(xml.Channel, c)
 	}
 	for _, v := range s {
 		var p entities.ProgrammeGuide
-		p.Start = time.Unix(0, v.Start*1000000).Format(xmldateformat)
-		p.Stop = time.Unix(0, v.End*1000000).Format(xmldateformat)
+		p.Start = time.Unix(0, v.Start*1000000).Format(Xmldateformat)
+		p.Stop = time.Unix(0, v.End*1000000).Format(Xmldateformat)
 		p.Channel = strconv.Itoa(v.Channel.SID)
 		p.Category.Category = v.Category
 		p.Desc.Desc = v.Detail
@@ -83,7 +90,7 @@ func ConvertEpgToXML() *entities.Guide {
 			p.EpisodeNum.System = "dd_progid"
 			var tail string
 			if v.Episode == 0 {
-				tail = time.Unix(0, v.Start*1000000).Format(episodedateformat)
+				tail = time.Unix(0, v.Start*1000000).Format(Episodedateformat)
 			} else {
 				tail = fmt.Sprintf("%04d", v.Episode)
 			}

@@ -54,19 +54,32 @@ type DeviceChild struct {
 }
 
 // Service : json
-type Service struct {
-	ID        int    `json:"id"`
-	ServiceID int    `json:"serviceId"`
-	NetworkID int    `json:"networkId"`
-	Name      string `json:"name"`
+type Service []struct {
+	ID                 int64  `json:"id"`
+	ServiceID          int    `json:"serviceId"`
+	NetworkID          int    `json:"networkId"`
+	Name               string `json:"name"`
+	Type               int    `json:"type"`
+	LogoID             int    `json:"logoId"`
+	RemoteControlKeyID int    `json:"remoteControlKeyId"`
+	Channel            struct {
+		Type    string `json:"type"`
+		Channel string `json:"channel"`
+	} `json:"channel"`
+	HasLogoData bool `json:"hasLogoData"`
 }
 
 // Channel : json
 type Channel struct {
-	Type     string    `json:"type"`
-	Channel  string    `json:"channel"`
-	Name     string    `json:"name"`
-	Services []Service `json:"services"`
+	Type     string `json:"type"`
+	Channel  string `json:"channel"`
+	Name     string `json:"name"`
+	Services []struct {
+		ID        int    `json:"id"`
+		ServiceID int    `json:"serviceId"`
+		NetworkID int    `json:"networkId"`
+		Name      string `json:"name"`
+	} `json:"services"`
 }
 
 // Channels : json
@@ -82,14 +95,14 @@ type Guide struct {
 
 // ChannelGuide : xml
 type ChannelGuide struct {
-	ID          string           `xml:"id,attr"`
-	DisplayName DisplayNameGuide `xml:"display-name"`
-}
-
-// DisplayNameGuide : xml
-type DisplayNameGuide struct {
-	Lang        string `xml:"lang,attr"`
-	DisplayName string `xml:",chardata"`
+	ID          string `xml:"id,attr"`
+	DisplayName struct {
+		Lang        string `xml:"lang,attr"`
+		DisplayName string `xml:",chardata"`
+	} `xml:"display-name"`
+	Icon struct {
+		Src string `xml:"src,attr"`
+	} `xml:"icon"`
 }
 
 // ProgrammeGuide : xml
@@ -159,4 +172,45 @@ type ExtraSchedule struct {
 type ChannelSchedule struct {
 	SID  int    `json:"sid"`
 	Name string `json:"name"`
+}
+
+// MirakurunPrograms : json
+type MirakurunPrograms []struct {
+	ID          int64  `json:"id"`
+	EventID     int    `json:"eventId"`
+	ServiceID   int    `json:"serviceId"`
+	NetworkID   int    `json:"networkId"`
+	StartAt     int64  `json:"startAt"`
+	Duration    int    `json:"duration"`
+	IsFree      bool   `json:"isFree"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Video       struct {
+		Type          string `json:"type"`
+		Resolution    string `json:"resolution"`
+		StreamContent int    `json:"streamContent"`
+		ComponentType int    `json:"componentType"`
+	} `json:"video"`
+	Audio struct {
+		SamplingRate  int `json:"samplingRate"`
+		ComponentType int `json:"componentType"`
+	} `json:"audio"`
+	Genres []struct {
+		Lv1 int `json:"lv1"`
+		Lv2 int `json:"lv2"`
+		Un1 int `json:"un1"`
+		Un2 int `json:"un2"`
+	} `json:"genres,omitempty"`
+	RelatedItems []struct {
+		ServiceID int `json:"serviceId"`
+		EventID   int `json:"eventId"`
+	} `json:"relatedItems,omitempty"`
+	Extended struct {
+		ProgrammeContent   string `json:"番組内容"`
+		Performer          string `json:"出演者"`
+		OriginalScreenplay string `json:"原作・脚本"`
+		Director           string `json:"監督・演出"`
+		Production         string `json:"制作"`
+		Music              string `json:"音楽"`
+	} `json:"extended,omitempty"`
 }
