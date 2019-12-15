@@ -3,6 +3,7 @@ module github.com/plainbanana/lapis
 go 1.13.4
 
 require (
+	github.com/djherbis/stream v1.2.0
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/joho/godotenv v1.2.0

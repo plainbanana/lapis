@@ -13,6 +13,8 @@
 
 .env
 lapis
+lapis-v2
 main
 vendor
 vendor/*
+subs/*

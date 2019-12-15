@@ -5,6 +5,7 @@ func NewDevice() Device {
 	dev := Device{}
 	dev.FriendlyName = "lapis"
 	dev.Manufacturer = "Silicondust"
+	// Built in Transcoder
 	dev.ModelNumber = "HDTC-2US"
 	dev.FirmwareName = "hdhomeruntc_atsc"
 	dev.DeviceID = "12345678"
