@@ -76,7 +76,7 @@ func ConvertEpgToXML() *entities.Guide {
 		p.Stop = time.Unix(0, v.End*1000000).Format(Xmldateformat)
 		p.Channel = strconv.Itoa(v.Channel.SID)
 		p.Category.Category = v.Category
-		p.Desc.Desc = v.Detail
+		p.Desc.Desc = v.Detail + " lapisID:" + v.ID
 		titleSlice := strings.Split(v.Title, "▽")
 		p.Title.Title = titleSlice[0]
 		if len(titleSlice) >= 2 {

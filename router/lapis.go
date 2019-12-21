@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/djherbis/stream"
 	"github.com/gin-gonic/gin"
+	"github.com/plainbanana/lapis/app"
 	"github.com/plainbanana/lapis/entities"
 )
 
@@ -55,6 +57,7 @@ func Stream(c *gin.Context) {
 	log.Println(base)
 
 	// get program from mirakurun
+	// TODO: xmltv should contain dualmonostereo info
 	req, _ := http.NewRequest("GET", base, nil)
 	q := req.URL.Query()
 	q.Add("serviceId", serviceID)
@@ -68,34 +71,44 @@ func Stream(c *gin.Context) {
 	var programs entities.MirakurunPrograms
 	jsonDecoder := json.NewDecoder(res.Body)
 	err = jsonDecoder.Decode(&programs)
-	log.Println(err)
-	log.Println("mirakurun", req.URL.String())
+
+	// find audio component type
+	var isdualmonostereo bool = false
+	cursor2 := time.Now().Add(5*time.Minute).UnixNano() / 1000000
+	for _, v := range programs {
+		if cursor2 > v.StartAt && cursor2 < v.StartAt+int64(v.Duration) {
+			if v.Audio.ComponentType == 2 {
+				isdualmonostereo = true
+			}
+		}
+	}
+
+	xmltv := app.ConvertEpgToXML()
 
 	var subtitle string = os.Getenv("SUBTITLE_DIR")
 	if subtitle == "" {
 		log.Fatal("set SUBTITLE_DIR")
 	}
-	var tmpsubtitle string
-	var isdualmonostereo bool = false
 
 	// search on air program cursor
 	// TODO: handle program name collectly
-	cursor := time.Now().Add(5*time.Minute).UnixNano() / 1000000
+	var tmpsubtitle string
+	var lapisID string
+	cursor := time.Now().Add(5 * time.Minute).Format(app.Xmldateformat)
 	log.Println(cursor)
-	for _, v := range programs {
-		if cursor > v.StartAt && cursor < v.StartAt+int64(v.Duration) {
-			base := subtitle
+	for _, v := range xmltv.Programme {
+		if v.Channel == serviceID {
+			if cursor > v.Start && cursor < v.Stop {
+				base := subtitle
 
-			fname := v.Name + "-" + fmt.Sprint(v.StartAt) + "-" + time.Now().In(jst).Format(time.RFC3339Nano)
-			subtitle = path.Join(base, fname)
-			log.Println("found!!!", v.Name, v.ServiceID)
+				lapisID = strings.Split(v.Desc.Desc, "lapisID:")[1]
+				fname := lapisID + "-" + v.Title.Title + "-" + fmt.Sprint(v.Start) + "-" + time.Now().In(jst).Format(time.RFC3339Nano)
+				subtitle = path.Join(base, fname)
+				log.Println("found!!!", v.Title.Title, v.Channel, lapisID)
 
-			// b := base64.StdEncoding.EncodeToString([]byte(v.Name))
-			fname = time.Now().Format(time.RFC3339Nano)
-			tmpsubtitle = path.Join(base, fname)
-
-			if v.Audio.ComponentType == 2 {
-				isdualmonostereo = true
+				// b := base64.StdEncoding.EncodeToString([]byte(v.Name))
+				fname = time.Now().Format(time.RFC3339Nano)
+				tmpsubtitle = path.Join(base, fname)
 			}
 		}
 	}
@@ -160,7 +173,7 @@ func Stream(c *gin.Context) {
 			"-i", "pipe:0",
 			"-c:v", "copy",
 			"-acodec", "ac3", "-b:a", "192k",
-			"-c:s", "ass",
+			"-c:s", "webvtt",
 			"-f", "matroska", tmpsubtitle)
 	} else {
 		tmpsubtitle += ".ass"
@@ -295,8 +308,68 @@ func Stream(c *gin.Context) {
 	stdout, err := ffmpegSubtitle.CombinedOutput()
 	log.Println("progout", err, string(stdout))
 
-	defer sw.Close()
+	sw.Close()
 	log.Println("end prog")
+
+	if strings.Contains(subtitle, "[字]") {
+		tmpfile, err := ioutil.TempFile("", "mergetmp")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		r, err := sw.NextReader()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer r.Close()
+
+		defer os.Remove(tmpfile.Name())
+		defer tmpfile.Close()
+
+		io.Copy(tmpfile, r)
+	}
+	// if strings.Contains(subtitle, "[字]") {
+	// 	r, err := sw.NextReader()
+	// 	if err != nil {
+	// 		log.Println("Err at concatsubtitle", err)
+	// 	}
+	// 	ffmpegConcatSubtitle := exec.Command(ffmpeg,
+	// 		"-analyzeduration", "2MB",
+	// 		"-probesize", "2MB",
+	// 		"-fix_sub_duration",
+	// 		"-dual_mono_mode", "main",
+	// 		"-i", "pipe:0",
+	// 		"-i", tmpsubtitle,
+	// 		"-c:v", "copy",
+	// 		"-acodec", "ac3", "-b:a", "192k",
+	// 		"-c:s", "ass",
+	// 		"-f", "matroska", tmpsubtitle+".mkv")
+
+	// 	stdin, _ := ffmpegConcatSubtitle.StdinPipe()
+	// 	ffmpegConcatSubtitle.Stdout = os.Stdout
+	// 	ffmpegConcatSubtitle.Stderr = os.Stderr
+	// 	ffmpegConcatSubtitle.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	// 	ffmpegSubtitle.Start()
+
+	// 	defer func() {
+	// 		log.Println("post process2 start")
+	// 		// ffmpegSubtitle.Process.Kill()
+	// 		gpid, err := syscall.Getpgid(ffmpegConcatSubtitle.Process.Pid)
+	// 		if err == nil {
+	// 			syscall.Kill(-gpid, 15)
+	// 		}
+	// 		ffmpegSubtitle.Wait()
+	// 		c.Request.Body.Close()
+	// 		log.Println("post process2 end")
+	// 	}()
+
+	// 	go func() {
+	// 		io.Copy(stdin, r)
+	// 		stdin.Close()
+	// 	}()
+	// 	os.Remove(tmpsubtitle)
+	// 	tmpsubtitle += ".mkv"
+	// }
 
 	if _, err := os.Stat(tmpsubtitle); err == nil {
 		// if file contains "WEBVTT" only, remove
