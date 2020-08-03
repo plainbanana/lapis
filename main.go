@@ -6,8 +6,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/plainbanana/lapis/app"
+	"github.com/plainbanana/lapis/entities"
 	"github.com/plainbanana/lapis/router"
 )
+
+func init() {
+	if os.Getenv("DOTENV") == "true" {
+		envLoad()
+	}
+
+	app.MirakurunBase = "http://" + os.Getenv("MIRAKURUN_IP") + ":" + os.Getenv("MIRAKURUN_PORT")
+	if os.Getenv("MIRAKURUN_HTTPS") == "true" {
+		app.MirakurunBase = "https://" + os.Getenv("MIRAKURUN_IP") + ":" + os.Getenv("MIRAKURUN_PORT")
+	}
+}
 
 func envLoad() {
 	err := godotenv.Load()
@@ -17,10 +30,6 @@ func envLoad() {
 }
 
 func main() {
-	if os.Getenv("DOTENV") == "true" {
-		envLoad()
-	}
-
 	r := gin.Default()
 
 	r.GET("/discover.json", router.Discover)
@@ -31,6 +40,12 @@ func main() {
 	r.GET("/ContentDirectory.xml", router.ContentDirectory)
 	r.GET("/epg.xml", router.EPG)
 	r.POST("/lineup.post", router.PostLineup)
+	r.GET("/stream/:OriginURL", router.Stream)
 
-	r.Run(":" + os.Getenv("LAPIS_PORT"))
+	entities.LapisPort = os.Getenv("LAPIS_PORT")
+	if entities.LapisPort == "" {
+		entities.LapisPort = "8080"
+	}
+
+	r.Run(":" + entities.LapisPort)
 }

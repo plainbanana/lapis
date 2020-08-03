@@ -9,7 +9,8 @@ import (
 // Discover : GET /discover.json
 func Discover(c *gin.Context) {
 	device := entities.NewDevice()
-	c.BindJSON(&device)
+	// does not have built in Transcoder
+	device.ModelNumber = "HDHR5-2US"
 
 	c.JSON(200, device)
 }
